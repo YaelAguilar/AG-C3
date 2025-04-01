@@ -1,0 +1,16 @@
+id_capa,tipo_capa,material_capa,grosor_capa,durabilidad,eficiencia,precio_capa,disponibilidad_capa
+C001,Antirreflejante Básico,MgF2,0.12,Media,85%,35.00,Alta
+C002,Antirreflejante Premium,Multicapa Óxidos Metálicos,0.18,Alta,98%,65.00,Media
+C003,Hidrofóbica,Silicona modificada,0.08,Media,92%,45.00,Alta
+C004,Oleofóbica,Fluoropolímeros,0.05,Media,94%,50.00,Media
+C005,Antiestática,Óxido de Indio-Estaño,0.06,Media,90%,48.00,Media
+C006,Endurecida,Resina Epoxi,0.25,Alta,96%,40.00,Alta
+C007,Fotocromática Standard,Óxidos de Plata,0.20,Media,88%,80.00,Media
+C008,Fotocromática Premium,Naftopyrano,0.20,Alta,95%,105.00,Baja
+C009,Polarizada Standard,PVA,0.30,Media,92%,75.00,Media
+C010,Polarizada Premium,TAC,0.28,Alta,99%,95.00,Baja
+C011,Anti-Empañante,Hidrogel modificado,0.10,Media,90%,55.00,Media
+C012,Anti-Rasguños,Silicio,0.22,Alta,97%,38.00,Alta
+C013,Espejo,Aluminio,0.15,Media,95%,60.00,Media
+C014,Anti-Luz Azul Básico,Óxidos Mixtos,0.14,Media,80%,45.00,Alta
+C015,Anti-Luz Azul Premium,Compuestos Orgánicos,0.16,Alta,95%,75.00,Media

@@ -1,0 +1,16 @@
+id_montura,tipo_montura,grosor_montura,material_armazon,resistencia,flexibilidad,precio_montura,disponibilidad_montura
+M001,Full-Frame,5.2,Acetato,Alta,Baja,85.50,Alta
+M002,Full-Frame,6.0,Acetato Premium,Alta,Media,120.75,Media
+M003,Full-Frame,4.8,Metal,Media,Baja,95.30,Alta
+M004,Full-Frame,3.5,Titanio,Alta,Media,185.90,Baja
+M005,Full-Frame,4.0,Aleación de Aluminio,Media,Alta,110.25,Media
+M006,Semi-Rimless,3.2,Metal,Baja,Media,125.60,Alta
+M007,Semi-Rimless,3.8,Acero Inoxidable,Alta,Baja,145.30,Media
+M008,Semi-Rimless,2.9,Titanio Beta,Alta,Alta,195.75,Baja
+M009,Rimless,2.5,Titanio,Media,Alta,175.50,Baja
+M010,Rimless,2.2,Aleación de Berilio,Alta,Alta,195.25,Baja
+M011,Full-Frame,5.5,TR-90 (Nylon),Media,Alta,95.00,Alta
+M012,Full-Frame,4.5,Ultem,Alta,Alta,125.00,Media
+M013,Semi-Rimless,3.0,Monel,Media,Media,105.50,Alta
+M014,Rimless,2.0,Titanio Memoria,Alta,Alta,210.00,Baja
+M015,Full-Frame,5.0,Celulosa Acetato,Media,Media,90.00,Alta

@@ -1,0 +1,16 @@
+id_padecimiento,nombre_padecimiento,descripcion,recomendacion_montura,recomendacion_lente,recomendacion_capa,recomendacion_filtro
+P001,Miopía,Dificultad para ver objetos lejanos,Full-Frame,Índice alto > 1.60,Antirreflejante,UV400
+P002,Hipermetropía,Dificultad para ver objetos cercanos,Full-Frame,Índice medio > 1.56,Antirreflejante,UV400
+P003,Astigmatismo,Visión distorsionada,Full-Frame o Semi-Rimless,Índice alto > 1.61,Antirreflejante Premium,UV400
+P004,Presbicia,Dificultad para enfocar de cerca por edad,Full-Frame o Semi-Rimless,Progresivo/Índice alto,Antirreflejante,Anti Luz Azul
+P005,Fotofobia,Sensibilidad excesiva a la luz,Full-Frame,Índice medio,Fotocromática,Terapéutico Verde
+P006,Sequedad Ocular,Insuficiente lubricación ocular,Full-Frame,Índice alto,Hidrofóbica,Anti Luz Azul
+P007,Retinopatía Diabética,Daño en retina por diabetes,Full-Frame,Índice alto,Antirreflejante Premium,Anti Luz Azul Premium
+P008,Glaucoma,Daño al nervio óptico,Full-Frame,Índice medio,Antirreflejante,Terapéutico Ámbar
+P009,Degeneración Macular,Pérdida de visión central,Full-Frame,Índice alto,Antirreflejante Premium,Alta Definición
+P010,Fatiga Visual Digital,Cansancio por uso de pantallas,Semi-Rimless,Índice medio,Anti-Luz Azul,Anti Luz Azul Premium
+P011,Cataratas,Opacidad del cristalino,Full-Frame,Índice alto,Antirreflejante Premium,Polarizado Premium
+P012,Queratocono,Córnea en forma de cono,Full-Frame rígido,Índice alto especializado,Endurecida,UV400
+P013,Ambliopía,Ojo vago,Full-Frame,Según prescripción,Antirreflejante,UV400
+P014,Estrabismo,Desalineación de los ojos,Full-Frame resistente,Según prescripción,Antirreflejante,UV400
+P015,Retinitis Pigmentosa,Degeneración retinal progresiva,Full-Frame,Alta transmisión,Antirreflejante Premium,Alta Definición

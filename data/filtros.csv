@@ -1,0 +1,16 @@
+id_filtro,tipo_filtro,funcion_principal,atenuacion_luz,selectividad,precio_filtro,disponibilidad_filtro
+F001,UV400,Bloqueo UV 100%,5%,Alta,25.00,Alta
+F002,Anti Luz Azul Básico,Reducción luz azul nociva,15%,Media,35.00,Alta
+F003,Anti Luz Azul Premium,Bloqueo selectivo luz azul,20%,Alta,55.00,Media
+F004,Solar Categoría 1,Protección solar leve,20%,Baja,30.00,Alta
+F005,Solar Categoría 2,Protección solar media,35%,Media,40.00,Alta
+F006,Solar Categoría 3,Protección solar alta,65%,Alta,50.00,Media
+F007,Polarizado Standard,Eliminación reflejos,50%,Media,65.00,Media
+F008,Polarizado Premium,Eliminación reflejos y contraste,55%,Alta,85.00,Baja
+F009,Fotocromático Indoor,Adaptativo interior-exterior,15-45%,Media,75.00,Media
+F010,Fotocromático Outdoor,Adaptativo exterior intenso,25-80%,Alta,90.00,Baja
+F011,Melanina,Protección específica melanopía,30%,Alta,70.00,Baja
+F012,Terapéutico Verde,Migrañas y fotofobia,40%,Alta,60.00,Media
+F013,Terapéutico Ámbar,Sensibilidad luz/insomnio,35%,Alta,65.00,Media
+F014,Alta Definición,Mejora contraste,10%,Alta,80.00,Baja
+F015,Conducción Nocturna,Reducción deslumbramiento,25%,Alta,70.00,Media
