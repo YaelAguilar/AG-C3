@@ -77,83 +77,39 @@ class FitnessEvaluator:
         if not self.padecimiento_data:
             return 0.5  # Valor neutro si no hay padecimiento específico
         
+        # Obtener recomendaciones para el padecimiento
+        recomendacion_montura = self.padecimiento_data.get('recomendacion_montura', '')
+        recomendacion_lente = self.padecimiento_data.get('recomendacion_lente', '')
+        recomendacion_capa = self.padecimiento_data.get('recomendacion_capa', '')
+        recomendacion_filtro = self.padecimiento_data.get('recomendacion_filtro', '')
+        
         # 1. Evaluar la montura
-        if 'montura' in individual.montura:
-            # Ejemplos de criterios:
-            # - Miopía/Hipermetropía: Preferible monturas ligeras
-            # - Astigmatismo: Preferible monturas estables
-            if self.padecimiento_data['nombre_padecimiento'] in ['Miopía', 'Hipermetropía']:
-                if individual.montura.get('material') in ['Titanio', 'TR-90']:
-                    puntuacion += 0.15
-            elif self.padecimiento_data['nombre_padecimiento'] == 'Astigmatismo':
-                if individual.montura.get('tipo') in ['Full-Frame']:
-                    puntuacion += 0.15
+        if individual.montura:
+            tipo_montura = individual.montura.get('tipo_montura', '')
+            if recomendacion_montura.lower() in tipo_montura.lower():
+                puntuacion += 0.25
         
         # 2. Evaluar el lente
         if individual.lente:
-            # Evaluar material del lente para el padecimiento
-            materiales_recomendados = {
-                'Miopía': ['Policarbonato', 'Alto índice'],
-                'Hipermetropía': ['Alto índice', 'Cristal'],
-                'Astigmatismo': ['Alto índice', 'Policarbonato'],
-                'Presbicia': ['Progresivo', 'Bifocal'],
-                'Glaucoma': ['Policarbonato', 'Fotocromático'],
-                'Degeneración Macular': ['Alto índice', 'Fotocromático'],
-                'Fotofobia': ['Fotocromático', 'Polarizado'],
-                'Sequedad Ocular': ['Hidrofóbico', 'Antirreflejo'],
-                'Retinopatía Diabética': ['Alto índice', 'Protección UV'],
-                'Fatiga Visual Digital': ['Antirreflejo', 'Filtro luz azul']
-            }
-            
-            if self.padecimiento_data['nombre_padecimiento'] in materiales_recomendados:
-                if individual.lente.get('material') in materiales_recomendados[self.padecimiento_data['nombre_padecimiento']]:
-                    puntuacion += 0.20
+            forma_lente = individual.lente.get('forma_lente', '')
+            if recomendacion_lente.lower() in forma_lente.lower():
+                puntuacion += 0.25
         
         # 3. Evaluar capas
-        if individual.capas:
-            capas_recomendadas = {
-                'Miopía': ['Antirreflejo', 'Endurecida'],
-                'Hipermetropía': ['Antirreflejo', 'Endurecida'],
-                'Astigmatismo': ['Antirreflejo', 'Endurecida'],
-                'Presbicia': ['Antirreflejo', 'Endurecida'],
-                'Glaucoma': ['Fotocromática', 'Antirreflejo'],
-                'Degeneración Macular': ['Fotocromática', 'Protección UV'],
-                'Fotofobia': ['Fotocromática', 'Polarizada'],
-                'Sequedad Ocular': ['Hidrofóbica'],
-                'Retinopatía Diabética': ['Antirreflejo', 'Protección UV'],
-                'Fatiga Visual Digital': ['Antirreflejo', 'Filtro luz azul']
-            }
-            
-            if self.padecimiento_data['nombre_padecimiento'] in capas_recomendadas:
-                recomendadas = capas_recomendadas[self.padecimiento_data['nombre_padecimiento']]
-                capas_nombres = [capa.get('tipo', '') for capa in individual.capas]
-                
-                # Calcular cuántas de las capas recomendadas están presentes
-                coincidencias = sum(1 for rec in recomendadas if any(rec.lower() in c.lower() for c in capas_nombres))
-                puntuacion += (0.30 * coincidencias / max(1, len(recomendadas)))
+        if individual.capas and recomendacion_capa:
+            for capa in individual.capas:
+                tipo_capa = capa.get('tipo_capa', '')
+                if recomendacion_capa.lower() in tipo_capa.lower():
+                    puntuacion += 0.25
+                    break
         
         # 4. Evaluar filtros
-        if individual.filtros:
-            filtros_recomendados = {
-                'Miopía': ['UV400'],
-                'Hipermetropía': ['UV400'],
-                'Astigmatismo': ['UV400'],
-                'Presbicia': ['UV400', 'Anti Luz Azul'],
-                'Glaucoma': ['UV400', 'Polarizado'],
-                'Degeneración Macular': ['UV400', 'Alta Definición'],
-                'Fotofobia': ['Polarizado', 'UV400'],
-                'Sequedad Ocular': ['UV400'],
-                'Retinopatía Diabética': ['UV400', 'Polarizado'],
-                'Fatiga Visual Digital': ['Anti Luz Azul', 'UV400']
-            }
-            
-            if self.padecimiento_data['nombre_padecimiento'] in filtros_recomendados:
-                recomendados = filtros_recomendados[self.padecimiento_data['nombre_padecimiento']]
-                filtros_nombres = [filtro.get('tipo', '') for filtro in individual.filtros]
-                
-                # Calcular cuántos de los filtros recomendados están presentes
-                coincidencias = sum(1 for rec in recomendados if any(rec.lower() in f.lower() for f in filtros_nombres))
-                puntuacion += (0.35 * coincidencias / max(1, len(recomendados)))
+        if individual.filtros and recomendacion_filtro:
+            for filtro in individual.filtros:
+                tipo_filtro = filtro.get('tipo_filtro', '')
+                if recomendacion_filtro.lower() in tipo_filtro.lower():
+                    puntuacion += 0.25
+                    break
         
         return min(1.0, puntuacion)
     
@@ -168,50 +124,78 @@ class FitnessEvaluator:
             float: Puntuación de calidad (0-1)
         """
         puntuacion = 0.0
-        total_componentes = 0
+        componentes_evaluados = 0
         
-        # Evaluar calidad de la montura (basado en material)
+        # Evaluar calidad de la montura
         if individual.montura:
-            total_componentes += 1
-            calidad_materiales = {
-                'Acetato': 0.7,
-                'Metal': 0.8,
-                'Titanio': 0.95,
-                'TR-90': 0.9
-            }
-            puntuacion += calidad_materiales.get(individual.montura.get('material', ''), 0.5)
+            componentes_evaluados += 1
+            # Evaluar por material y resistencia
+            material = individual.montura.get('material_armazon', '').lower()
+            resistencia = individual.montura.get('resistencia', '').lower()
+            
+            # Puntuación por material
+            if 'titanio' in material:
+                puntuacion += 1.0
+            elif 'acetato' in material:
+                puntuacion += 0.8
+            elif 'metal' in material:
+                puntuacion += 0.7
+            else:
+                puntuacion += 0.5
+            
+            # Puntuación por resistencia
+            if 'alta' in resistencia:
+                puntuacion += 1.0
+            elif 'media' in resistencia:
+                puntuacion += 0.7
+            else:
+                puntuacion += 0.4
         
         # Evaluar calidad del lente
         if individual.lente:
-            total_componentes += 1
-            calidad_lentes = {
-                'Cristal': 0.75,
-                'Policarbonato': 0.85,
-                'Alto índice': 0.95,
-                'Trivex': 0.9,
-                'CR-39': 0.7
-            }
-            puntuacion += calidad_lentes.get(individual.lente.get('material', ''), 0.5)
+            componentes_evaluados += 1
+            # Evaluar por índice de refracción
+            indice = individual.lente.get('indice_refraccion', 0)
+            
+            if indice >= 1.67:
+                puntuacion += 1.0
+            elif indice >= 1.6:
+                puntuacion += 0.8
+            elif indice >= 1.5:
+                puntuacion += 0.6
+            else:
+                puntuacion += 0.4
         
-        # Evaluar calidad promedio de capas
+        # Evaluar calidad de capas
         if individual.capas:
             for capa in individual.capas:
-                total_componentes += 1
-                # Asumimos que capas más caras son de mayor calidad
-                precio_normalizado = min(1.0, capa.get('precio', 0) / 500)
-                puntuacion += 0.5 + (precio_normalizado * 0.5)  # 0.5 a 1.0 basado en precio
+                componentes_evaluados += 1
+                durabilidad = capa.get('durabilidad', '').lower()
+                
+                if 'alta' in durabilidad:
+                    puntuacion += 1.0
+                elif 'media' in durabilidad:
+                    puntuacion += 0.7
+                else:
+                    puntuacion += 0.4
         
-        # Evaluar calidad promedio de filtros
+        # Evaluar calidad de filtros
         if individual.filtros:
             for filtro in individual.filtros:
-                total_componentes += 1
-                # Asumimos que filtros más caros son de mayor calidad
-                precio_normalizado = min(1.0, filtro.get('precio', 0) / 400)
-                puntuacion += 0.5 + (precio_normalizado * 0.5)  # 0.5 a 1.0 basado en precio
+                componentes_evaluados += 1
+                selectividad = filtro.get('selectividad', '').lower()
+                
+                if 'alta' in selectividad:
+                    puntuacion += 1.0
+                elif 'media' in selectividad:
+                    puntuacion += 0.7
+                else:
+                    puntuacion += 0.4
         
         # Calcular promedio
-        if total_componentes > 0:
-            return puntuacion / total_componentes
+        total_evaluaciones = componentes_evaluados * 1.0  # Cada componente tiene 1 evaluación
+        if componentes_evaluados > 0:
+            return puntuacion / total_evaluaciones
         return 0.5  # Valor neutro si no hay componentes
     
     def _evaluar_precio(self, individual):
@@ -229,17 +213,17 @@ class FitnessEvaluator:
         # Si el precio está dentro del rango, puntuación máxima
         if self.precio_min <= precio <= self.precio_max:
             # Mejor puntuación para precios más cercanos al mínimo dentro del rango
-            return 1.0 - 0.3 * ((precio - self.precio_min) / (self.precio_max - self.precio_min))
+            return 1.0 - 0.3 * ((precio - self.precio_min) / (self.precio_max - self.precio_min + 0.001))
         
         # Si está por debajo del mínimo, penalizar ligeramente (podría indicar baja calidad)
         elif precio < self.precio_min:
-            return 0.7 * (precio / self.precio_min)
+            return 0.7 * (precio / (self.precio_min + 0.001))
         
         # Si está por encima del máximo, penalizar significativamente
         else:
             exceso = precio - self.precio_max
             # Cuánto más excede, peor puntuación
-            return max(0, 0.5 - (exceso / self.precio_max) * 0.5)
+            return max(0, 0.5 - (exceso / (self.precio_max + 0.001)) * 0.5)
     
     def _evaluar_restricciones_adicionales(self, individual):
         """
@@ -264,13 +248,13 @@ class FitnessEvaluator:
             tiene_solucion_luz = False
             
             for capa in individual.capas:
-                if 'fotocrom' in capa.get('tipo', '').lower():
+                if 'fotocrom' in capa.get('tipo_capa', '').lower():
                     tiene_solucion_luz = True
                     break
             
             if not tiene_solucion_luz:
                 for filtro in individual.filtros:
-                    if any(t in filtro.get('tipo', '').lower() for t in ['polarizado', 'uv']):
+                    if any(t in filtro.get('tipo_filtro', '').lower() for t in ['polarizado', 'uv']):
                         tiene_solucion_luz = True
                         break
             
@@ -280,7 +264,7 @@ class FitnessEvaluator:
         if self.restricciones.get('screen_time', False):
             num_restricciones += 1
             # Buscar filtros de luz azul
-            tiene_filtro_azul = any('azul' in filtro.get('tipo', '').lower() 
+            tiene_filtro_azul = any('azul' in filtro.get('tipo_filtro', '').lower() 
                                    for filtro in individual.filtros)
             puntuacion += 1.0 if tiene_filtro_azul else 0.0
         
@@ -291,14 +275,14 @@ class FitnessEvaluator:
             tiene_proteccion_exterior = False
             
             for filtro in individual.filtros:
-                if any(t in filtro.get('tipo', '').lower() for t in ['uv', 'polarizado']):
+                if any(t in filtro.get('tipo_filtro', '').lower() for t in ['uv', 'polarizado']):
                     tiene_proteccion_exterior = True
                     break
             
             # También considerar capas fotocromáticas
             if not tiene_proteccion_exterior:
                 for capa in individual.capas:
-                    if 'fotocrom' in capa.get('tipo', '').lower():
+                    if 'fotocrom' in capa.get('tipo_capa', '').lower():
                         tiene_proteccion_exterior = True
                         break
             
@@ -308,9 +292,9 @@ class FitnessEvaluator:
         if self.restricciones.get('night_driving', False):
             num_restricciones += 1
             # Buscar antirreflejante y alta definición
-            tiene_antirreflejo = any('antirreflej' in capa.get('tipo', '').lower() 
+            tiene_antirreflejo = any('antirreflej' in capa.get('tipo_capa', '').lower() 
                                     for capa in individual.capas)
-            tiene_alta_def = any('alta definición' in filtro.get('tipo', '').lower() 
+            tiene_alta_def = any('alta definición' in filtro.get('tipo_filtro', '').lower() 
                                 for filtro in individual.filtros)
             
             if tiene_antirreflejo:
@@ -322,3 +306,4 @@ class FitnessEvaluator:
         if num_restricciones > 0:
             return puntuacion / num_restricciones
         return 1.0  # Si no se evaluaron restricciones, puntuación máxima
+

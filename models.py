@@ -6,7 +6,7 @@ class DataModels:
     Clase para manejar los modelos de datos del sistema OptiLens.
     Carga y proporciona acceso a los diferentes conjuntos de datos necesarios.
     """
-    def __init__(self, data_dir='ds'):
+    def __init__(self, data_dir='data'):
         """
         Inicializa el modelo de datos cargando los CSV desde el directorio especificado.
         
@@ -72,16 +72,19 @@ class DataModels:
         filtered_monturas = self.monturas.copy()
         
         if tipos:
-            filtered_monturas = filtered_monturas[filtered_monturas['tipo'].isin(tipos)]
+            filtered_monturas = filtered_monturas[filtered_monturas['tipo_montura'].isin(tipos)]
         
         if materiales:
-            filtered_monturas = filtered_monturas[filtered_monturas['material'].isin(materiales)]
+            filtered_monturas = filtered_monturas[filtered_monturas['material_armazon'].isin(materiales)]
         
         if min_precio is not None:
-            filtered_monturas = filtered_monturas[filtered_monturas['precio'] >= min_precio]
+            filtered_monturas = filtered_monturas[filtered_monturas['precio_montura'] >= min_precio]
         
         if max_precio is not None:
-            filtered_monturas = filtered_monturas[filtered_monturas['precio'] <= max_precio]
+            filtered_monturas = filtered_monturas[filtered_monturas['precio_montura'] <= max_precio]
+        
+        # Filtrar por disponibilidad
+        filtered_monturas = filtered_monturas[filtered_monturas['disponibilidad_montura'] != 'Baja']
         
         return filtered_monturas
     
@@ -102,10 +105,13 @@ class DataModels:
         filtered_lentes = self.lentes.copy()
         
         if min_precio is not None:
-            filtered_lentes = filtered_lentes[filtered_lentes['precio'] >= min_precio]
+            filtered_lentes = filtered_lentes[filtered_lentes['precio_lente'] >= min_precio]
         
         if max_precio is not None:
-            filtered_lentes = filtered_lentes[filtered_lentes['precio'] <= max_precio]
+            filtered_lentes = filtered_lentes[filtered_lentes['precio_lente'] <= max_precio]
+        
+        # Filtrar por disponibilidad
+        filtered_lentes = filtered_lentes[filtered_lentes['disponibilidad_lente'] != 'Baja']
         
         return filtered_lentes
     
@@ -127,13 +133,16 @@ class DataModels:
         filtered_capas = self.capas.copy()
         
         if tipos:
-            filtered_capas = filtered_capas[filtered_capas['tipo'].isin(tipos)]
+            filtered_capas = filtered_capas[filtered_capas['tipo_capa'].isin(tipos)]
         
         if min_precio is not None:
-            filtered_capas = filtered_capas[filtered_capas['precio'] >= min_precio]
+            filtered_capas = filtered_capas[filtered_capas['precio_capa'] >= min_precio]
         
         if max_precio is not None:
-            filtered_capas = filtered_capas[filtered_capas['precio'] <= max_precio]
+            filtered_capas = filtered_capas[filtered_capas['precio_capa'] <= max_precio]
+        
+        # Filtrar por disponibilidad
+        filtered_capas = filtered_capas[filtered_capas['disponibilidad_capa'] != 'Baja']
         
         return filtered_capas
     
@@ -155,13 +164,16 @@ class DataModels:
         filtered_filtros = self.filtros.copy()
         
         if tipos:
-            filtered_filtros = filtered_filtros[filtered_filtros['tipo'].isin(tipos)]
+            filtered_filtros = filtered_filtros[filtered_filtros['tipo_filtro'].isin(tipos)]
         
         if min_precio is not None:
-            filtered_filtros = filtered_filtros[filtered_filtros['precio'] >= min_precio]
+            filtered_filtros = filtered_filtros[filtered_filtros['precio_filtro'] >= min_precio]
         
         if max_precio is not None:
-            filtered_filtros = filtered_filtros[filtered_filtros['precio'] <= max_precio]
+            filtered_filtros = filtered_filtros[filtered_filtros['precio_filtro'] <= max_precio]
+        
+        # Filtrar por disponibilidad
+        filtered_filtros = filtered_filtros[filtered_filtros['disponibilidad_filtro'] != 'Baja']
         
         return filtered_filtros
 
@@ -192,22 +204,22 @@ class Individual:
         precio = 0
         
         # Suma precio de montura
-        if self.montura and 'precio' in self.montura:
-            precio += self.montura['precio']
+        if self.montura and 'precio_montura' in self.montura:
+            precio += self.montura['precio_montura']
         
         # Suma precio de lente
-        if self.lente and 'precio' in self.lente:
-            precio += self.lente['precio']
+        if self.lente and 'precio_lente' in self.lente:
+            precio += self.lente['precio_lente']
         
         # Suma precio de capas
         for capa in self.capas:
-            if 'precio' in capa:
-                precio += capa['precio']
+            if 'precio_capa' in capa:
+                precio += capa['precio_capa']
         
         # Suma precio de filtros
         for filtro in self.filtros:
-            if 'precio' in filtro:
-                precio += filtro['precio']
+            if 'precio_filtro' in filtro:
+                precio += filtro['precio_filtro']
         
         self.precio_total = precio
         return precio
@@ -230,12 +242,16 @@ class Individual:
     
     def __str__(self):
         """Representación en cadena del individuo."""
-        capas_str = ", ".join([capa.get('nombre', 'Sin nombre') for capa in self.capas])
-        filtros_str = ", ".join([filtro.get('nombre', 'Sin nombre') for filtro in self.filtros])
+        montura_info = f"Montura: {self.montura.get('id_montura', 'N/A')} - {self.montura.get('tipo_montura', 'N/A')}"
+        lente_info = f"Lente: {self.lente.get('id_lente', 'N/A')} - {self.lente.get('forma_lente', 'N/A')}"
         
-        return (f"Montura: {self.montura.get('nombre', 'Sin montura')} ({self.montura.get('material', 'N/A')})\n"
-                f"Lente: {self.lente.get('nombre', 'Sin lente')}\n"
+        capas_str = ", ".join([f"{capa.get('id_capa', 'N/A')} ({capa.get('tipo_capa', 'N/A')})" for capa in self.capas])
+        filtros_str = ", ".join([f"{filtro.get('id_filtro', 'N/A')} ({filtro.get('tipo_filtro', 'N/A')})" for filtro in self.filtros])
+        
+        return (f"{montura_info}\n"
+                f"{lente_info}\n"
                 f"Capas: {capas_str if capas_str else 'Ninguna'}\n"
                 f"Filtros: {filtros_str if filtros_str else 'Ninguno'}\n"
-                f"Precio Total: {self.precio_total:.2f} MXN\n"
+                f"Precio Total: ${self.precio_total:.2f}\n"
                 f"Aptitud: {self.fitness:.2f}")
+

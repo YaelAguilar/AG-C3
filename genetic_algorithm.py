@@ -132,6 +132,68 @@ class GeneticAlgorithm:
             parents.append(winner)
         return parents
     
+    def select_parents_with_diversity(self, num_parents):
+        """
+        Selecciona padres para reproducción usando selección por torneo con penalización por similitud.
+        
+        Args:
+            num_parents (int): Número de padres a seleccionar
+            
+        Returns:
+            list: Individuos seleccionados como padres
+        """
+        parents = []
+        selected_genotypes = set()
+        
+        for _ in range(num_parents):
+            # Selección por torneo con penalización por similitud
+            tournament_size = min(3, len(self.population))
+            tournament = random.sample(self.population, tournament_size)
+            
+            # Crear copias para no modificar los originales
+            tournament_with_penalties = []
+            for individual in tournament:
+                # Crear una copia del individuo para aplicar penalización
+                ind_copy = Individual(
+                    individual.montura.copy() if individual.montura else None,
+                    individual.lente.copy() if individual.lente else None,
+                    [capa.copy() for capa in individual.capas],
+                    [filtro.copy() for filtro in individual.filtros]
+                )
+                ind_copy.fitness = individual.fitness
+                
+                # Generar una representación del genotipo
+                genotype = (
+                    str(individual.montura.get('id_montura', 0)) if individual.montura else "None",
+                    str(individual.lente.get('id_lente', 0)) if individual.lente else "None",
+                    ",".join(sorted([str(capa.get('id_capa', 0)) for capa in individual.capas])),
+                    ",".join(sorted([str(filtro.get('id_filtro', 0)) for filtro in individual.filtros]))
+                )
+                
+                # Penalizar si es similar a uno ya seleccionado
+                if genotype in selected_genotypes:
+                    ind_copy.fitness *= 0.7  # Penalización fuerte por similitud
+                
+                tournament_with_penalties.append((ind_copy, genotype))
+            
+            # Seleccionar el ganador después de aplicar penalizaciones
+            winner, winner_genotype = max(tournament_with_penalties, key=lambda x: x[0].fitness)
+            
+            # Encontrar el individuo original correspondiente
+            for individual in tournament:
+                genotype = (
+                    str(individual.montura.get('id_montura', 0)) if individual.montura else "None",
+                    str(individual.lente.get('id_lente', 0)) if individual.lente else "None",
+                    ",".join(sorted([str(capa.get('id_capa', 0)) for capa in individual.capas])),
+                    ",".join(sorted([str(filtro.get('id_filtro', 0)) for filtro in individual.filtros]))
+                )
+                if genotype == winner_genotype:
+                    parents.append(individual)
+                    selected_genotypes.add(genotype)
+                    break
+        
+        return parents
+    
     def crossover(self, parent1, parent2):
         """
         Realiza operación de cruce entre dos padres para crear descendencia.
@@ -183,7 +245,7 @@ class GeneticAlgorithm:
             # Asegurar que no se repitan capas del mismo tipo
             unique_capas = {}
             for capa in combined_capas:
-                tipo = capa.get('tipo', '')
+                tipo = capa.get('tipo_capa', '')
                 if tipo not in unique_capas or random.random() < 0.5:
                     unique_capas[tipo] = capa.copy()
             
@@ -204,7 +266,7 @@ class GeneticAlgorithm:
             # Asegurar que no se repitan filtros del mismo tipo
             unique_filtros = {}
             for filtro in combined_filtros:
-                tipo = filtro.get('tipo', '')
+                tipo = filtro.get('tipo_filtro', '')
                 if tipo not in unique_filtros or random.random() < 0.5:
                     unique_filtros[tipo] = filtro.copy()
             
@@ -267,7 +329,7 @@ class GeneticAlgorithm:
                     capa_row = capas.sample(1).iloc[0]
                     nueva_capa = capa_row.to_dict()
                     # Evitar duplicados
-                    if not any(c.get('id') == nueva_capa.get('id') for c in individual.capas):
+                    if not any(c.get('id_capa') == nueva_capa.get('id_capa') for c in individual.capas):
                         individual.capas.append(nueva_capa)
                 
                 elif operacion == 'eliminar' and individual.capas:
@@ -293,7 +355,7 @@ class GeneticAlgorithm:
                     filtro_row = filtros.sample(1).iloc[0]
                     nuevo_filtro = filtro_row.to_dict()
                     # Evitar duplicados
-                    if not any(f.get('id') == nuevo_filtro.get('id') for f in individual.filtros):
+                    if not any(f.get('id_filtro') == nuevo_filtro.get('id_filtro') for f in individual.filtros):
                         individual.filtros.append(nuevo_filtro)
                 
                 elif operacion == 'eliminar' and individual.filtros:
@@ -342,7 +404,8 @@ class GeneticAlgorithm:
         num_offspring = self.population_size - len(elite_copies)
         num_parents_needed = (num_offspring + 1) // 2 * 2  # Asegurar número par
         
-        parents = self.select_parents(num_parents_needed)
+        # Usar selección con diversidad para mejorar la variedad de soluciones
+        parents = self.select_parents_with_diversity(num_parents_needed)
         
         # Cruce para generar descendencia
         for i in range(0, len(parents), 2):
